@@ -1,42 +1,21 @@
 import 'dart:developer';
-import 'package:connectivity/connectivity.dart';
-import 'package:flutter/material.dart';
+import 'package:cyber_royale/layout/bloc/social_events.dart';
+import 'package:cyber_royale/layout/bloc/states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cyber_royale/layout/cubit/states.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:cyber_royale/models/post_model.dart';
-import 'package:cyber_royale/modules/feeds/Feeds.dart';
+import 'package:cyber_royale/shared/network/remote/http_helper.dart';
 
-import '../../shared/network/remote/http_helper.dart';
-
-class SocialCubit extends Cubit<SocialStates> {
-  SocialCubit() : super(SocialInitialState());
-
-  static SocialCubit get(context) => BlocProvider.of(context);
-
-  PostModel? postModel;
-
-  int currentIndex = 0;
-  List<Widget> screens = [
-    const FeedsScreen(),
-    const FeedsScreen(),
-    const FeedsScreen(),
-    const FeedsScreen(),
-  ];
-  List<String> title = [
-    'News Feed',
-    'News Feed',
-    'News Feed',
-    'News Feed',
-  ];
-
-  void changeBottomNav(int index) {
-    currentIndex = index;
-    emit(SocialChangeBottomNavState());
+class SocialBloc extends Bloc<SocialEvent, SocialState> {
+  SocialBloc() : super(SocialInitialState()) {
+    on<GetPostsEvent>(_onGetPosts);
+    on<ChangeBottomNavEvent>(_onChangeBottomNav);
   }
 
+  int currentIndex = 0;
   List<PostModel> posts = [];
 
-  void getPost() async {
+  void _onGetPosts(GetPostsEvent event, Emitter<SocialState> emit) async {
     emit(SocialGetPostLoadingState());
 
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -46,7 +25,7 @@ class SocialCubit extends Cubit<SocialStates> {
         if (response != null && response['status'] == 'success') {
           List<dynamic> data = response['data'];
           posts = data.map((e) => PostModel.fromJson(e)).toList();
-          emit(SocialGetPostOnlySuccessState());
+          emit(SocialGetPostOnlySuccessState(posts));
         } else {
           throw 'Failed to load data';
         }
@@ -57,5 +36,10 @@ class SocialCubit extends Cubit<SocialStates> {
     } else {
       emit(SocialGetPostOnlyErrorState('No internet connection'));
     }
+  }
+
+  void _onChangeBottomNav(ChangeBottomNavEvent event, Emitter<SocialState> emit) {
+    currentIndex = event.index;
+    emit(SocialChangeBottomNavState(currentIndex));
   }
 }
