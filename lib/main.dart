@@ -1,17 +1,17 @@
-import 'package:cyber_royale/layout/bloc/bloc.dart';
 import 'package:cyber_royale/shared/bloc_observer.dart';
-import 'package:cyber_royale/shared/network/local/cache_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cyber_royale/shared/styles/themes.dart';
-import 'layout/bloc/social_events.dart';
-import 'layout/bloc/states.dart';
-import 'layout/social_app.dart';
+import 'feed/presentation/manager/bloc.dart';
+import 'feed/presentation/manager/social_events.dart';
+import 'feed/presentation/manager/states.dart';
+import 'feed/presentation/pages/social_app.dart';
+import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
   Bloc.observer = MyBlocObserver();
-  await CacheHelper.init();
   runApp(const MyApp());
 }
 

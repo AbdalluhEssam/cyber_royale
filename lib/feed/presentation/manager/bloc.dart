@@ -1,10 +1,11 @@
 import 'dart:developer';
-import 'package:cyber_royale/layout/bloc/social_events.dart';
-import 'package:cyber_royale/layout/bloc/states.dart';
+import 'package:cyber_royale/feed/presentation/manager/social_events.dart';
+import 'package:cyber_royale/feed/presentation/manager/states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:cyber_royale/models/post_model.dart';
-import 'package:cyber_royale/shared/network/remote/http_helper.dart';
+
+import '../../../core/network/remote/http_helper.dart';
+import '../../data/models/post_model.dart';
 
 class SocialBloc extends Bloc<SocialEvent, SocialState> {
   SocialBloc() : super(SocialInitialState()) {
@@ -23,8 +24,9 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
       try {
         final response = await HttpHelper.getData('ozcan/posts.php');
         if (response != null && response['status'] == 'success') {
-          List<dynamic> data = response['data'];
+          List data = response['data'];
           posts = data.map((e) => PostModel.fromJson(e)).toList();
+          log(posts[0].image.toString());
           emit(SocialGetPostOnlySuccessState(posts));
         } else {
           throw 'Failed to load data';

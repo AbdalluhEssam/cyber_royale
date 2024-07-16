@@ -1,4 +1,4 @@
-import '../../models/post_model.dart';
+import '../../data/models/post_model.dart';
 
 abstract class SocialState {}
 
